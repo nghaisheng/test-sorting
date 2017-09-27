@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Factorial Test</title>
+	<style type="text/css">
+		.error {
+			color: red;
+		}
+		#result {
+			font-weight: bold;
+		}
+	</style>
+</head>
+<body>
+	<p>The first line contains a single integer as n, which indicates the size of the array. (2 - 100,000)</p>
+	<p>The next line contains n integers separated by spaces. (0 - 1,000,000)</p>
+	<textarea name="number1" id="number1" rows="3" cols="50"></textarea>
+	<button>Result</button>
+	<p class="error"></p>
+	<pre id="result"></pre>
+
+	<script src="js/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() {
+
+			function isDuplicate(values) {
+				for (var i = 0; i < values.length-1; i++) {
+					for (var i2 = i+1; i2 < values.length; i2++) {
+						if (values[i] === values[i2]) return true;
+					}
+				}
+				return false;
+			}
+
+			function getSorted(values) {
+				for (var i = 0; i < values.length-1; i++) {
+					if (values[i] > values[i+1]) {
+						return {
+							sorted: false,
+							index: i
+						};
+					}
+				}
+				return {sorted: true};
+			}
+
+			function getSwap(values) {
+				var temp, idx, idx2;
+				var sorted = getSorted(values);
+				idx = sorted.index;
+				temp = values[idx-1];
+				for (var i = idx+1; i < values.length; i++) {
+					if (values[i] <= temp) return '';
+					if (idx2 === undefined) {
+						idx2 = i;
+					} else {
+						if (values[i] < values[idx2]) idx2 = i;
+					}
+				}
+				var nums = values.slice();
+				temp = nums[idx];
+				nums[idx] = nums[idx2];
+				nums[idx2] = temp;
+				if (getSorted(nums).sorted) {
+					return 'Yes\nSwap '+(idx+1)+' '+(idx2+1);
+				} else {
+					return '';
+				}
+			}
+
+			function getReverse(values) {
+				var temp, idx, idx2;
+				var sorted = getSorted(values);
+				idx = sorted.index;
+				temp = values[idx];
+				for (var i = idx+1; i < values.length; i++) {
+					if (values[i] > temp) {
+						idx2 = i-1;
+						break;
+					}
+				}
+				if (idx2 === undefined) idx2 = values.length-1;
+				var nums = values.slice();
+				var count = Math.ceil((idx2+1-idx) / 2);
+				for (var i = 0; i < count; i++) {
+					temp = nums[idx+i];
+					nums[idx+i] = nums[idx2-i];
+					nums[idx2-i] = temp;
+				}
+				if (getSorted(nums).sorted) {
+					return 'Yes\nReverse '+(idx+1)+' '+(idx2+1);
+				} else {
+					return '';
+				}
+			}
+
+			$('button').click(function() {
+				var lines = $('#number1').val();
+				$('.error').text('');
+				$('#result').text('');
+				lines = lines.split('\n');
+				if (lines.length != 2) {
+					$('.error').text('The input must be 2 lines.');
+					return;
+				}
+				var num1 = lines[0].trim();
+				if (num1 === '' || isNaN(num1)) {
+					$('.error').text('The first line must be a number.');
+					return;
+				}
+				num1 = parseInt(num1);
+				if (num1 < 2 || num1 > 100000) {
+					$('.error').text('The first line should be in 2 - 100,000.');
+					return;
+				}
+				var nums = [];
+				var line2 = lines[1].split(' ');
+				for (var i = 0; i < line2.length; i++) {
+					var temp = line2[i].trim();
+					if (temp !== '') {
+						if (isNaN(temp)) {
+							$('.error').text('The second line must be a number.');
+							return;
+						}
+						temp = parseInt(temp);
+						if (temp < 0 || temp > 1000000) {
+							$('.error').text('The second line should be in 0 - 1,000,000.');
+							return;
+						}
+						nums.push(temp);
+					}
+				}
+				if (isDuplicate(nums)) {
+					$('.error').text('The second line must be distinct.');
+					return;
+				}
+
+				if (nums.length !== num1) {
+					$('#result').text("No");
+					return;
+				}
+
+				if (getSorted(nums).sorted) {
+					$('#result').text("Yes");
+					return;
+				}
+				var result = getSwap(nums);
+				if (result !== '') {
+					$('#result').text(result);
+					return;
+				}
+				result = getReverse(nums);
+				if (result !== '') {
+					$('#result').text(result);
+					return;
+				}
+				$('#result').text("No");
+			});
+		});
+	</script>
+</body>
+</html>
